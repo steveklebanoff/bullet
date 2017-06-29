@@ -215,6 +215,7 @@ end
 
 Then wrap each test in Bullet api.
 
+rspec:
 ```ruby
 # spec/spec_helper.rb
 if Bullet.enable?
@@ -226,6 +227,28 @@ if Bullet.enable?
     Bullet.perform_out_of_channel_notifications if Bullet.notification?
     Bullet.end_request
   end
+end
+```
+
+minitest:
+```ruby
+# test/test_helper.rb
+module MiniTestWithBullet
+  def before_setup
+    Bullet.start_request
+    super if defined?(super)
+  end
+
+  def after_teardown
+    Bullet.perform_out_of_channel_notifications if Bullet.notification?
+    Bullet.end_request
+    super if defined?(super)
+  end
+end
+
+# include in ActiveSupport::TestCase or specific test
+class ActiveSupport::TestCase
+  include MiniTestWithBullet
 end
 ```
 
